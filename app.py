@@ -113,6 +113,11 @@ def search(book_name, list):
 @app.route('/', methods=['POST', 'GET'])
 def home():
     form = SearchForm()
+    if form.search_btn.data:
+        result = []
+        filters = Filter()
+        result = search(form.keywords.data, books)
+        return render_template('browse.html', title=form.search_btn.data, form= form, books = result, browse='browse', filters = filters)
     return render_template('home.html', title='Books Store', form= form, books = books[:4])
 
 @app.route('/browse', methods=['POST', 'GET'])
@@ -130,7 +135,7 @@ def browse():
     elif form.search_btn.data:
         result = []
         result = search(form.keywords.data, books)
-        return render_template('browse.html', title='form.search_btn.data', form= form, books = result, browse='browse', filters = filters)
+        return render_template('browse.html', title=form.search_btn.data, form= form, books = result, browse='browse', filters = filters)
 
     return render_template('browse.html', title='Browse Books', form= form, books = books, browse='browse', filters = filters)
 
