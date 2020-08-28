@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2 class="border-bottom my-4">Browse Books</h2>
+  <div class="filter ml-5">
+    <form class="" action="{{ url_for('browse') }}" method="POST">
+      <label for="filter">Filter</label>
+      {{ filters.filter(class='custom-select', width='18rem') }}
+      {{ filters.go(class='btn btn-info') }}
+    </form>
+  </div>
+  <div class="row justify-content-center">
+    {% if books %}
+      {% for book in books %}
+        <div class="card col-lg-2 mx-2 my-2 flex-fill" style="width: 18rem;">
+          <img src="{{ book.img_url }}" class="card-img-top" alt="...">
+          <div class="card-body">
+            <h5 class="card-title">{{ book.name }}</h5>
+            <p class="card-text">Author: {{ book.author }}</p>
+            <a href="#" class="btn btn-primary">See book</a>
+          </div>
+        </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+{% endblock %}

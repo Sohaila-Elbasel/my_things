@@ -1,0 +1,31 @@
+nav.navbar-light{
+  background-color: #1ecbe1;
+}
+nav.navbar-light .navbar-brand{
+  color: #fff;
+}
+.nav-item .form-inline .form-control{
+  width: 30em;
+}
+.carousel-inner .carousel-item{
+  height: 475px;
+}
+.search{
+  height: 25em;
+  padding: 6em;
+  text-align: center;
+}
+.search .form-control{
+  padding: 1.5em;
+}
+.latest-books .card{
+  margin-right: 25px;
+}
+.filter{
+  margin-bottom: 10px;
+}
+.filter .custom-select{
+  border: 1px solid #ccc;
+  border-radius: 16px;
+  width: 18em;
+}
