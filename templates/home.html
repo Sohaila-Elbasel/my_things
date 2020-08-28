@@ -49,7 +49,7 @@
               <div class="card-body">
                 <h5 class="card-title">{{ book.name }}</h5>
                 <p class="card-text">Author: {{ book.author }}</p>
-                <a href="#" class="btn btn-primary">See book</a>
+                <a href="{{ url_for('book', name=book.name) }}" class="btn btn-primary">See book</a>
               </div>
             </div>
           {% endfor %}
