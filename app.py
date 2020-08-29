@@ -2,6 +2,7 @@ from flask import Flask, render_template, url_for, flash, redirect, request
 from forms import SearchForm, Filter, User
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine
+from models import *
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'dca5f91bd1299c2a4a2db9491840eb05'
@@ -103,12 +104,8 @@ books = [
 
 ]
 
-def search(book_name, list):
-    result = []
-    for book in list:
-        if book_name.lower() in book['name'].lower():
-            result.append(book)
-    return result
+def search(book, book_list):
+    pass
 
 @app.route('/', methods=['POST', 'GET'])
 def home():
@@ -116,33 +113,40 @@ def home():
     if form.search_btn.data:
         result = []
         filters = Filter()
-        result = search(form.keywords.data, books)
-        return render_template('browse.html', title=form.search_btn.data, form= form, books = result, browse='browse', filters = filters)
-    return render_template('home.html', title='Books Store', form= form, books = books[:4])
+        result = Book.query.filter(Book.name.contains(form.keywords.data))
+        return render_template('browse.html', title=f'search for {form.keywords.data}', form= form, books = result, filters = filters)
+
+    books = Book.query.limit(4)
+    return render_template('home.html', title='Books Store', form= form, books = books)
 
 @app.route('/browse', methods=['POST', 'GET'])
 def browse():
     form = SearchForm()
     filters = Filter()
 
+    if request.method == 'GET':
+        books = Book.query.all()
+
     if filters.go.data:
         filter_list = []
         for book in books:
             if book['category'] == filters.filter.data:
                 filter_list.append(book)
-        return render_template('browse.html', title=filters.filter.data, form= form, books = filter_list, browse='browse', filters = filters)
+        return render_template('browse.html', title=filters.filter.data, form= form, books = filter_list, filters = filters)
 
     elif form.search_btn.data:
         result = []
         result = search(form.keywords.data, books)
-        return render_template('browse.html', title=form.search_btn.data, form= form, books = result, browse='browse', filters = filters)
+        return render_template('browse.html', title=f'search for {form.keywords.data}', form= form, books = result, filters = filters)
 
-    return render_template('browse.html', title='Browse Books', form= form, books = books, browse='browse', filters = filters)
+    return render_template('browse.html', title='Browse Books', form= form, books = books, filters = filters)
 
-@app.route('/books/<string:name>', methods=['POST', 'GET'])
-def book(name):
+@app.route('/books/<int:book_id>/<string:name>', methods=['POST', 'GET'])
+def book(book_id, name):
     form = SearchForm()
-    return render_template('book.html', title= name, form= form, name= name)
+    book = Book.query.get(book_id)
+    category = Category.query.get(book.category_id).name
+    return render_template('book.html', title= name, form= form, name= name, book = book, category = category)
 
 @app.route('/register', methods=['POST', 'GET'])
 def register():
