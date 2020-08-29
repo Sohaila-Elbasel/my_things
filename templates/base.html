@@ -41,9 +41,9 @@
             {% endif %}
           </ul>
           <ul class="navbar-nav">
-            {% if user %}
+            {% if session['username'] %}
             <li class="nav-item">
-              <a class="nav-link" href="#">Logout</a>
+              <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
             </li>
             {% else %}
               <li class="nav-item">
@@ -63,7 +63,7 @@
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
           {% for category, message in messages %}
-            <div class="alert alert-{{ category }}">
+            <div class="alert alert-{{ category }} mt-5">
               {{ message }}
             </div>
           {% endfor %}

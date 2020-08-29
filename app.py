@@ -1,8 +1,9 @@
-from flask import Flask, render_template, url_for, flash, redirect, request
-from forms import SearchForm, Filter, User
+from flask import Flask, session, render_template, url_for, flash, redirect, request
+from forms import SearchForm, Filter, UserForm, loginForm
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine
 from models import *
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'dca5f91bd1299c2a4a2db9491840eb05'
@@ -10,108 +11,11 @@ app.config["SQLALCHEMY_DATABASE_URI"] = 'postgres://hqethunzcsnxmp:980d9b1b73b63
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 
-books = [
-        {'name': 'Life of Pi',
-         'author': 'Yann Martel',
-         'published': ' 2003',
-         'category': 'action',
-         'img_url': 'https://images-na.ssl-images-amazon.com/images/I/51rxEvLljUL._SX322_BO1,204,203,200_.jpg'
-        },
-        {'name': 'The Three Musketeers',
-         'author': ' Alexandre Dumas',
-         'published': '2014',
-         'category': 'action',
-         'img_url': 'https://images-na.ssl-images-amazon.com/images/I/41TxXqToCCL._SX348_BO1,204,203,200_.jpg'
-        },
-        {'name': '1984',
-         'author': 'George Orwell',
-         'published': '1949',
-         'category': 'classics',
-         'img_url': 'https://images-na.ssl-images-amazon.com/images/I/81WunXo0giL.jpg'
-        },
-        {'name': '1984',
-         'author': 'George Orwell',
-         'published': '1949',
-         'category': 'classics',
-         'img_url': 'https://kbimages1-a.akamaihd.net/e39ed975-600f-49c7-b29d-5d531f24f09f/353/569/90/False/dSCAQLyKPDObZmRnq4PCYQ.jpg'
-        },
-        {'name': '1984',
-         'author': 'George Orwell',
-         'published': '1949',
-         'category': 'Comic Book',
-         'img_url': 'https://kbimages1-a.akamaihd.net/e39ed975-600f-49c7-b29d-5d531f24f09f/353/569/90/False/dSCAQLyKPDObZmRnq4PCYQ.jpg'
-        },
-        {'name': '1984',
-         'author': 'George Orwell',
-         'published': '1949',
-         'category': 'horror',
-         'img_url': 'https://kbimages1-a.akamaihd.net/fb0c52e7-c427-4eb3-b5aa-9aafc7efea43/353/569/90/False/AhIbw1TJuje1l6QPMtht5A.jpg'
-        },
-        {'name': '1984',
-         'author': 'George Orwell',
-         'published': '1949',
-         'category': 'horror',
-         'img_url': 'https://images-na.ssl-images-amazon.com/images/I/81WunXo0giL.jpg'
-        },
-        {'name': '1984',
-         'author': 'George Orwell',
-         'published': '1949',
-         'category': 'horror',
-         'img_url': 'https://images-na.ssl-images-amazon.com/images/I/81WunXo0giL.jpg'
-        },
-        {'name': '1984',
-         'author': 'George Orwell',
-         'published': '1949',
-         'category': 'horror',
-         'img_url': 'https://kbimages1-a.akamaihd.net/e39ed975-600f-49c7-b29d-5d531f24f09f/353/569/90/False/dSCAQLyKPDObZmRnq4PCYQ.jpg'
-        },
-        {'name': '1984',
-         'author': 'George Orwell',
-         'published': '1949',
-         'category': 'historical',
-         'img_url': 'https://kbimages1-a.akamaihd.net/e39ed975-600f-49c7-b29d-5d531f24f09f/353/569/90/False/dSCAQLyKPDObZmRnq4PCYQ.jpg'
-        },
-        {'name': '1984',
-         'author': 'George Orwell',
-         'published': '1949',
-         'category': 'historical',
-         'img_url': 'https://kbimages1-a.akamaihd.net/fb0c52e7-c427-4eb3-b5aa-9aafc7efea43/353/569/90/False/AhIbw1TJuje1l6QPMtht5A.jpg'
-        },
-        {'name': '1984',
-         'author': 'George Orwell',
-         'published': '1949',
-         'category': 'historical',
-         'img_url': 'https://images-na.ssl-images-amazon.com/images/I/81WunXo0giL.jpg'
-        },
-        {'name': '1984',
-         'author': 'George Orwell',
-         'published': '1949',
-         'category': 'fantasy',
-         'img_url': 'https://images-na.ssl-images-amazon.com/images/I/81WunXo0giL.jpg'
-        },
-        {'name': '1984',
-         'author': 'George Orwell',
-         'published': '1949',
-         'category': 'fantasy',
-         'img_url': 'https://kbimages1-a.akamaihd.net/e39ed975-600f-49c7-b29d-5d531f24f09f/353/569/90/False/dSCAQLyKPDObZmRnq4PCYQ.jpg'
-        },
-        {'name': '1984',
-         'author': 'George Orwell',
-         'published': '1949',
-         'category': 'fantasy',
-         'img_url': 'https://kbimages1-a.akamaihd.net/e39ed975-600f-49c7-b29d-5d531f24f09f/353/569/90/False/dSCAQLyKPDObZmRnq4PCYQ.jpg'
-        },
-
-]
-
-def search(book, book_list):
-    pass
 
 @app.route('/', methods=['POST', 'GET'])
 def home():
     form = SearchForm()
     if form.search_btn.data:
-        result = []
         filters = Filter()
         result = Book.query.filter(Book.name.contains(form.keywords.data))
         return render_template('browse.html', title=f'search for {form.keywords.data}', form= form, books = result, filters = filters)
@@ -129,14 +33,11 @@ def browse():
 
     if filters.go.data:
         filter_list = []
-        for book in books:
-            if book['category'] == filters.filter.data:
-                filter_list.append(book)
+        filter_list = Category.query.get(filters.filter.data).books
         return render_template('browse.html', title=filters.filter.data, form= form, books = filter_list, filters = filters)
 
     elif form.search_btn.data:
-        result = []
-        result = search(form.keywords.data, books)
+        result = Book.query.filter(Book.name.contains(form.keywords.data))
         return render_template('browse.html', title=f'search for {form.keywords.data}', form= form, books = result, filters = filters)
 
     return render_template('browse.html', title='Browse Books', form= form, books = books, filters = filters)
@@ -151,23 +52,37 @@ def book(book_id, name):
 @app.route('/register', methods=['POST', 'GET'])
 def register():
     form = SearchForm()
-    form_register = User()
+    form_register = UserForm()
     if form_register.validate_on_submit():
+        password = generate_password_hash(form_register.password.data)
+        user = User(username = form_register.username.data, email = form_register.email.data, password = password)
+        db.session.add(user)
+        db.session.commit()
         flash(f'Acount created for {form_register.username.data}!', 'success')
-        return redirect(url_for('home'))
+        return redirect(url_for('signin'))
     return render_template('register.html', title= 'Join Now', form= form, form_register = form_register)
 
 
 @app.route('/signin', methods=['POST', 'GET'])
 def signin():
     form = SearchForm()
-    form_register = User()
+    form_register = loginForm()
+    print('before validation')
     if form_register.validate_on_submit():
-        flash(f'Acount created for {form_register.username.data}!', 'success')
-        return redirect(url_for('home'))
+        if User.query.filter_by(username = form_register.username.data).first():
+            print('user is ok')
+            user = User.query.filter_by(username = 'sherif').first()
+            if check_password_hash(user.password, form_register.password.data):
+                session['username'] = form_register.username.data
+                flash(f'{form_register.username.data} has logged in!', 'success')
+                return redirect(url_for('home'))
+        flash(f'{form_register.username.data} has not logged in!', 'danger')
     return render_template('signin.html', title= 'Log in', form= form, form_register = form_register)
 
-
+@app.route('/logout')
+def logout():
+    session.pop('username', None)
+    return redirect(url_for('home'))
 
 @app.errorhandler(404)
 def page_not_found(e):

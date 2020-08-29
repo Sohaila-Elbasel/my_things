@@ -32,4 +32,11 @@ def add_book():
 
 
 
-print(Book.query.all())
+# print(User.query.get(1).username)
+# print(User.query.get(1).email)
+
+# print(User.query.all())
+
+print(User.query.filter_by(username = 'sherif').first())
+if User.query.filter_by(username = 'sherif').first():
+    print('ok')
