@@ -47,6 +47,10 @@ def book(book_id, name):
     form = SearchForm()
     book = Book.query.get(book_id)
     category = Category.query.get(book.category_id).name
+    if form.search_btn.data:
+        filters = Filter()
+        result = Book.query.filter(Book.name.contains(form.keywords.data))
+        return render_template('browse.html', title=f'search for {form.keywords.data}', form= form, books = result, filters = filters)
     return render_template('book.html', title= name, form= form, name= name, book = book, category = category)
 
 @app.route('/register', methods=['POST', 'GET'])
