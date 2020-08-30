@@ -1,5 +1,11 @@
+body{
+  
+}
 nav.navbar-light{
-  background-color: #1ecbe1;
+  background-color: #072391;
+}
+.navbar-light .navbar-nav .nav-link{
+  color: #fff;
 }
 nav.navbar-light .navbar-brand{
   color: #fff;

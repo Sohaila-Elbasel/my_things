@@ -67,10 +67,8 @@ def register():
 def signin():
     form = SearchForm()
     form_register = loginForm()
-    print('before validation')
     if form_register.validate_on_submit():
         if User.query.filter_by(username = form_register.username.data).first():
-            print('user is ok')
             user = User.query.filter_by(username = 'sherif').first()
             if check_password_hash(user.password, form_register.password.data):
                 session['username'] = form_register.username.data
